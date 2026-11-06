@@ -11,6 +11,7 @@ import type {
 
 import { formatDuration } from '../hooks/flow-pane'
 import { firstSentence, flattenToOneLine } from '../hooks/one-line'
+import { paletteNamed } from '../hooks/flow-palette'
 
 const PANE_ID = 'session-flow'
 const WIDE_COLUMNS = 60
@@ -1234,6 +1235,22 @@ test('dracula 색상을 고를 수 있다', { options: { palette: 'dracula' } },
 
   expect(request?.props.color).toBe('#bd93f9')
   expect(opened).toEqual(['#21222c'])
+})
+
+test('테마마다 고유한 색을 쓰고 모르는 이름은 기본 색으로 둔다', () => {
+  const names = ['catppuccin', 'dracula', 'tokyo-night', 'rose-pine', 'nord', 'gruvbox', 'kanagawa']
+  const requestColors = names.map(name => paletteNamed(name).request)
+
+  expect(new Set(requestColors).size).toBe(names.length)
+
+  for (const name of names) {
+    const palette = paletteNamed(name)
+
+    expect(palette.paneBackground).toMatch(/^#[0-9a-f]{6}$/)
+    expect(palette.failed).toMatch(/^#[0-9a-f]{6}$/)
+  }
+
+  expect(paletteNamed('없는 이름')).toEqual(paletteNamed('catppuccin'))
 })
 
 test('claude 색상을 고르면 테마를 따라가고 배경을 칠하지 않는다', { options: { palette: 'claude' } }, async ($, on) => {

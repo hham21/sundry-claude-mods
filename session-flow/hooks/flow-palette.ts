@@ -46,9 +46,67 @@ const DRACULA_PALETTE: FlowPalette = {
   paneBackground: '#21222c',
 }
 
+// 아래 값은 각 테마의 공식 저장소 팔레트와 대조했다. 창 배경은 가능하면 사이드바에 쓰는
+// 한 단계 어두운 색을 쓴다.
+const TOKYO_NIGHT_PALETTE: FlowPalette = {
+  request: '#bb9af7',
+  done: '#9ece6a',
+  waiting: '#e0af68',
+  failed: '#f7768e',
+  label: '#7aa2f7',
+  unknown: '#565f89',
+  paneBackground: '#16161e',
+}
+
+/** Rosé Pine에는 초록이 없어서 완료는 Foam을 쓴다. */
+const ROSE_PINE_PALETTE: FlowPalette = {
+  request: '#c4a7e7',
+  done: '#9ccfd8',
+  waiting: '#f6c177',
+  failed: '#eb6f92',
+  label: '#ebbcba',
+  unknown: '#6e6a86',
+  paneBackground: '#191724',
+}
+
+const NORD_PALETTE: FlowPalette = {
+  request: '#88c0d0',
+  done: '#a3be8c',
+  waiting: '#ebcb8b',
+  failed: '#bf616a',
+  label: '#81a1c1',
+  unknown: '#4c566a',
+  paneBackground: '#2e3440',
+}
+
+const GRUVBOX_PALETTE: FlowPalette = {
+  request: '#fe8019',
+  done: '#b8bb26',
+  waiting: '#fabd2f',
+  failed: '#fb4934',
+  label: '#8ec07c',
+  unknown: '#928374',
+  paneBackground: '#1d2021',
+}
+
+const KANAGAWA_PALETTE: FlowPalette = {
+  request: '#957fb8',
+  done: '#98bb6c',
+  waiting: '#e6c384',
+  failed: '#e46876',
+  label: '#7e9cd8',
+  unknown: '#727169',
+  paneBackground: '#16161d',
+}
+
 const PALETTES: Record<string, FlowPalette> = {
   catppuccin: CATPPUCCIN_PALETTE,
   dracula: DRACULA_PALETTE,
+  'tokyo-night': TOKYO_NIGHT_PALETTE,
+  'rose-pine': ROSE_PINE_PALETTE,
+  nord: NORD_PALETTE,
+  gruvbox: GRUVBOX_PALETTE,
+  kanagawa: KANAGAWA_PALETTE,
   claude: CLAUDE_PALETTE,
 }
 

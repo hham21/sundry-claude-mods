@@ -7,9 +7,18 @@
     "palette": {
       "type": "string",
       "title": "색상",
-      "description": "catppuccin과 dracula는 같은 이름의 herdr 테마에 맞춘 고정 색이고, claude는 Claude Code 테마를 따라갑니다. 창 배경은 창을 다시 열면 바뀝니다.",
+      "description": "claude는 Claude Code 테마를 따라가고, 나머지는 같은 이름의 테마에 맞춘 고정 색입니다. 창 배경은 창을 다시 열면 바뀝니다.",
       "default": "catppuccin",
-      "options": ["catppuccin", "dracula", "claude"]
+      "options": [
+        "catppuccin",
+        "dracula",
+        "tokyo-night",
+        "rose-pine",
+        "nord",
+        "gruvbox",
+        "kanagawa",
+        "claude"
+      ]
     },
     "showNarration": {
       "type": "boolean",
