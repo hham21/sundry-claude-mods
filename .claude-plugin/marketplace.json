@@ -1,0 +1,11 @@
+{
+  "name": "sundry-claude-mods",
+  "owner": { "name": "ham" },
+  "plugins": [
+    {
+      "name": "session-flow",
+      "source": "./session-flow",
+      "description": "세션에서 시킨 일과 그 흐름을 한 줄씩 보여 주는 로그 창"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "session-flow",
+  "version": "0.1.0",
+  "description": "세션에서 시킨 일과 그 흐름을 한 줄씩 보여 주는 로그 창",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "showNarration": {
+      "type": "boolean",
+      "title": "모델의 중간 설명 표시",
+      "description": "도구를 쓰기 전후에 모델이 한 말의 첫 문장도 로그에 남깁니다.",
+      "default": true
+    },
+    "summarize": {
+      "type": "boolean",
+      "title": "한 줄 요약",
+      "description": "긴 요청과 최종 답을 Haiku로 한 줄로 줄입니다. 턴마다 최대 두 번 모델을 호출합니다. 끄면 앞부분을 잘라서 보여 줍니다.",
+      "default": true
+    }
+  }
+}
