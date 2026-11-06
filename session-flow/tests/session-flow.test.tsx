@@ -1182,6 +1182,60 @@ test('네 표면 모두에서 그려지고 좁으면 시각을 뺀다', async ($
   }
 })
 
+test('기본 색은 herdr의 Catppuccin에 맞춘다', async ($, on) => {
+  standInForEngine(on)
+  const opened: unknown[] = []
+  on('ui.panes', () => ({ value: [] }))
+  on('ui.open', (_, e) => {
+    opened.push(e.backgroundColor)
+
+    return { value: { isPlaced: true } }
+  })
+
+  await submitPrompt($, '요청')
+  await runFlowCommand($)
+
+  const ui = await $.ui.mount({
+    plugin: 'session-flow',
+    surface: 'terminal',
+    component: 'Pane',
+    requestId: PANE_ID,
+    props: paneProps(WIDE_COLUMNS),
+  })
+  const request = await ui.find({ type: 'Text', text: /요청/ })
+  await ui.unmount()
+
+  expect(request?.props.color).toBe('#cba6f7')
+  expect(opened).toEqual(['#181825'])
+})
+
+test('claude 색상을 고르면 테마를 따라가고 배경을 칠하지 않는다', { options: { palette: 'claude' } }, async ($, on) => {
+  standInForEngine(on)
+  const opened: unknown[] = []
+  on('ui.panes', () => ({ value: [] }))
+  on('ui.open', (_, e) => {
+    opened.push(e.backgroundColor)
+
+    return { value: { isPlaced: true } }
+  })
+
+  await submitPrompt($, '요청')
+  await runFlowCommand($)
+
+  const ui = await $.ui.mount({
+    plugin: 'session-flow',
+    surface: 'terminal',
+    component: 'Pane',
+    requestId: PANE_ID,
+    props: paneProps(WIDE_COLUMNS),
+  })
+  const request = await ui.find({ type: 'Text', text: /요청/ })
+  await ui.unmount()
+
+  expect(request?.props.color).toBe('claude')
+  expect(opened).toEqual([undefined])
+})
+
 test('기록이 없을 때는 안내를 보인다', async $ => {
   expect(await linesOnPane($)).toEqual([
     '아직 기록이 없어요. 일을 시키면 여기에 쌓입니다.',

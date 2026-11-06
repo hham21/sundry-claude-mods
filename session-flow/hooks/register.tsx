@@ -22,6 +22,8 @@ import {
   reopenAgent,
   runningAgentIds,
 } from './flow-log'
+import { paletteNamed } from './flow-palette'
+import type { FlowPalette } from './flow-palette'
 import { drawFlowPane } from './flow-pane'
 import {
   MIN_CHARS_WORTH_SUMMARIZING,
@@ -58,12 +60,15 @@ function modelFamily(model: string): string {
   return model.match(MODEL_FAMILY)?.[0] ?? model
 }
 
-async function openFlowPane($: EngineInterface) {
+async function openFlowPane($: EngineInterface, palette: FlowPalette) {
   await $.ui.open({
     id: PANE_ID,
     title: PANE_TITLE,
     rows: PANE_ROWS,
     columns: PANE_COLUMNS,
+    ...(palette.paneBackground === undefined
+      ? {}
+      : { backgroundColor: palette.paneBackground }),
   })
 }
 
@@ -184,6 +189,7 @@ async function recordRequest(
 }
 
 export const register: Register = (on, options) => {
+  const palette = paletteNamed(options.palette)
   // claude -p 같은 자동 실행은 보는 사람이 없다. 저장 칸을 차지하거나 요약 호출을 쓰지 않는다.
   let isHeadless = false
   // 세션 시작 시점에는 fullscreen인지 모른다. 첫 그리기에서 판단하려고 맡겨 둔다.
@@ -413,7 +419,7 @@ export const register: Register = (on, options) => {
       await forgetPaneFolder($, await $.session.root())
       await $.ui.close({ id: PANE_ID })
     } else {
-      await openFlowPane($)
+      await openFlowPane($, palette)
       await rememberPaneFolder($, await $.session.root())
       followNewestRowsOnceDrawn($)
     }
@@ -458,7 +464,7 @@ export const register: Register = (on, options) => {
       isPaneRestorePending = false
 
       if (isFullscreen) {
-        void openFlowPane($)
+        void openFlowPane($, palette)
       }
     }
 
@@ -468,7 +474,9 @@ export const register: Register = (on, options) => {
       return next(e)
     }
 
-    return drawQuestionBand($.ui.resolve(e), questions, () => closeQuestions($))
+    return drawQuestionBand($.ui.resolve(e), questions, palette, () =>
+      closeQuestions($),
+    )
   })
 
   on('ui.render', { component: 'Pane', requestId: PANE_ID }, async ($, e) => {
@@ -488,6 +496,6 @@ export const register: Register = (on, options) => {
     placementDrawn = e.props.placement
     rowCountDrawn = rows.length
 
-    return drawFlowPane($.ui.resolve(e), rows, e.props.bodyColumns)
+    return drawFlowPane($.ui.resolve(e), rows, e.props.bodyColumns, palette)
   })
 }

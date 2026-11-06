@@ -1,6 +1,7 @@
 import type { ElementTable } from 'claude-code'
 
 import type { AgentRow, FlowRow, TurnEndRow } from '../types'
+import type { FlowPalette } from './flow-palette'
 
 /** 이 폭보다 좁으면 시각을 빼고 내용에 자리를 준다. */
 const MIN_COLUMNS_FOR_TIME = 40
@@ -56,11 +57,17 @@ const AGENT_STATUS_MARK: Record<AgentRow['status'], string> = {
   unknown: '?',
 }
 
-const AGENT_STATUS_COLOR: Record<AgentRow['status'], string> = {
-  running: 'warning',
-  done: 'success',
-  failed: 'error',
-  unknown: 'subtle',
+function agentStatusColor(status: AgentRow['status'], palette: FlowPalette) {
+  switch (status) {
+    case 'running':
+      return palette.waiting
+    case 'done':
+      return palette.done
+    case 'failed':
+      return palette.failed
+    case 'unknown':
+      return palette.unknown
+  }
 }
 
 const TURN_END_MARK: Record<TurnEndRow['outcome'], string> = {
@@ -70,11 +77,16 @@ const TURN_END_MARK: Record<TurnEndRow['outcome'], string> = {
   failed: '✗',
 }
 
-const TURN_END_COLOR: Record<TurnEndRow['outcome'], string> = {
-  answered: 'success',
-  waiting: 'warning',
-  aborted: 'error',
-  failed: 'error',
+function turnEndColor(outcome: TurnEndRow['outcome'], palette: FlowPalette) {
+  switch (outcome) {
+    case 'answered':
+      return palette.done
+    case 'waiting':
+      return palette.waiting
+    case 'aborted':
+    case 'failed':
+      return palette.failed
+  }
 }
 
 const ROW_BULLET = '· '
@@ -107,14 +119,14 @@ function prefixOf(row: FlowRow): string {
   }
 }
 
-function styleOf(row: FlowRow): RowStyle {
+function styleOf(row: FlowRow, palette: FlowPalette): RowStyle {
   switch (row.kind) {
     case 'request':
-      return { color: 'claude', bold: true }
+      return { color: palette.request, bold: true }
     case 'turn-end':
-      return { color: TURN_END_COLOR[row.outcome] }
+      return { color: turnEndColor(row.outcome, palette) }
     case 'question':
-      return row.isOpen ? { color: 'warning' } : { dimColor: true }
+      return row.isOpen ? { color: palette.waiting } : { dimColor: true }
     case 'narration':
       return { dimColor: true }
     case 'notice':
@@ -125,7 +137,7 @@ function styleOf(row: FlowRow): RowStyle {
   }
 }
 
-function drawBody(row: FlowRow, { Text }: Elements) {
+function drawBody(row: FlowRow, palette: FlowPalette, { Text }: Elements) {
   switch (row.kind) {
     case 'request':
     case 'narration':
@@ -135,14 +147,14 @@ function drawBody(row: FlowRow, { Text }: Elements) {
     case 'activity':
       return (
         <Text>
-          <Text color="suggestion">{row.label}</Text> {listItems(row.items)}
+          <Text color={palette.label}>{row.label}</Text> {listItems(row.items)}
         </Text>
       )
     case 'agent':
       return (
         <Text>
-          <Text color="suggestion">{AGENT_LABEL}</Text>{' '}
-          <Text color={AGENT_STATUS_COLOR[row.status]}>
+          <Text color={palette.label}>{AGENT_LABEL}</Text>{' '}
+          <Text color={agentStatusColor(row.status, palette)}>
             {AGENT_STATUS_MARK[row.status]}
           </Text>{' '}
           {agentDuration(row)}
@@ -160,11 +172,12 @@ function drawBody(row: FlowRow, { Text }: Elements) {
 function drawRow(
   row: FlowRow,
   elements: Elements,
+  palette: FlowPalette,
   isTimeShown: boolean,
   isFirstRow: boolean,
 ) {
   const { Box, Text } = elements
-  const style = styleOf(row)
+  const style = styleOf(row, palette)
 
   // 머리표를 따로 두어 둘째 줄이 글 시작 위치에 맞게 한다.
   return (
@@ -179,7 +192,7 @@ function drawRow(
         </Box>
         <Box flexShrink={1}>
           <Text wrap="wrap" {...style}>
-            {drawBody(row, elements)}
+            {drawBody(row, palette, elements)}
           </Text>
         </Box>
       </Box>
@@ -196,6 +209,7 @@ export function drawFlowPane(
   elements: Elements,
   rows: readonly FlowRow[],
   bodyColumns: number,
+  palette: FlowPalette,
 ) {
   const { Box, Text } = elements
   const isTimeShown = bodyColumns >= MIN_COLUMNS_FOR_TIME
@@ -207,7 +221,7 @@ export function drawFlowPane(
   return (
     <Box flexDirection="column">
       {rows.map((row, index) =>
-        drawRow(row, elements, isTimeShown, index === 0),
+        drawRow(row, elements, palette, isTimeShown, index === 0),
       )}
     </Box>
   )

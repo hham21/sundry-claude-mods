@@ -4,6 +4,13 @@
   "description": "세션에서 시킨 일과 그 흐름을 한 줄씩 보여 주는 로그 창",
   "types": "./types/index.d.ts",
   "userConfig": {
+    "palette": {
+      "type": "string",
+      "title": "색상",
+      "description": "catppuccin은 herdr의 Catppuccin 테마에 맞춘 고정 색이고, claude는 Claude Code 테마를 따라갑니다. 창 배경은 창을 다시 열면 바뀝니다.",
+      "default": "catppuccin",
+      "options": ["catppuccin", "claude"]
+    },
     "showNarration": {
       "type": "boolean",
       "title": "모델의 중간 설명 표시",
