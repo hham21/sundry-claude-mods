@@ -35,6 +35,23 @@ const CATPPUCCIN_PALETTE: FlowPalette = {
   paneBackground: '#181825',
 }
 
+/** Dracula 공식 팔레트. 창 배경은 사이드바에 쓰는 한 단계 어두운 색이다. */
+const DRACULA_PALETTE: FlowPalette = {
+  request: '#bd93f9',
+  done: '#50fa7b',
+  waiting: '#f1fa8c',
+  failed: '#ff5555',
+  label: '#8be9fd',
+  unknown: '#6272a4',
+  paneBackground: '#21222c',
+}
+
+const PALETTES: Record<string, FlowPalette> = {
+  catppuccin: CATPPUCCIN_PALETTE,
+  dracula: DRACULA_PALETTE,
+  claude: CLAUDE_PALETTE,
+}
+
 export function paletteNamed(name: unknown): FlowPalette {
-  return name === 'claude' ? CLAUDE_PALETTE : CATPPUCCIN_PALETTE
+  return PALETTES[String(name)] ?? CATPPUCCIN_PALETTE
 }

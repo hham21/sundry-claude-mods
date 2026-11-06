@@ -1209,6 +1209,33 @@ test('기본 색은 herdr의 Catppuccin에 맞춘다', async ($, on) => {
   expect(opened).toEqual(['#181825'])
 })
 
+test('dracula 색상을 고를 수 있다', { options: { palette: 'dracula' } }, async ($, on) => {
+  standInForEngine(on)
+  const opened: unknown[] = []
+  on('ui.panes', () => ({ value: [] }))
+  on('ui.open', (_, e) => {
+    opened.push(e.backgroundColor)
+
+    return { value: { isPlaced: true } }
+  })
+
+  await submitPrompt($, '요청')
+  await runFlowCommand($)
+
+  const ui = await $.ui.mount({
+    plugin: 'session-flow',
+    surface: 'terminal',
+    component: 'Pane',
+    requestId: PANE_ID,
+    props: paneProps(WIDE_COLUMNS),
+  })
+  const request = await ui.find({ type: 'Text', text: /요청/ })
+  await ui.unmount()
+
+  expect(request?.props.color).toBe('#bd93f9')
+  expect(opened).toEqual(['#21222c'])
+})
+
 test('claude 색상을 고르면 테마를 따라가고 배경을 칠하지 않는다', { options: { palette: 'claude' } }, async ($, on) => {
   standInForEngine(on)
   const opened: unknown[] = []
