@@ -1297,7 +1297,7 @@ test('이전 버전이 저장한 값은 받지 않는다', async ($, on) => {
 })
 
 const LONG_PROMPT =
-  '클로드 모드 기능 이번에 출시되었잖아. 이 기능 사용해서 만들고 싶은것 중에 하나가 세션 진행 상황 로그를 볼수 있는 기능이야.'
+  '클로드 모드 기능 이번에 출시되었잖아. 이 기능 사용해서 만들고 싶은것 중에 하나가 세션 진행 상황 로그를 볼수 있는 기능이야. 그냥 한줄씩 뭘 했다 정도 간결하게.'
 
 test('기본 설정에서 긴 요청을 지정한 모델로 줄인다', async ($, on) => {
   const { clock } = standInForEngine(on)
@@ -1338,6 +1338,28 @@ test('요약이 실패해도 원문이 남는다', async ($, on) => {
   await clock.settle()
 
   expect((await linesOnPane($)).join('\n')).toContain('클로드 모드 기능')
+})
+
+test('시킨 일은 80자부터 요약한다', async ($, on) => {
+  const { clock } = standInForEngine(on)
+  let calls = 0
+  on('model.complete', () => {
+    calls += 1
+
+    return { value: { isAnswered: true, text: '요약', usage: NO_USAGE } }
+  })
+
+  const shorter = '가'.repeat(79)
+  await submitPrompt($, shorter)
+  await clock.settle()
+
+  expect(calls).toBe(0)
+  expect(await linesOnPane($)).toContain(`❯ ${shorter}`)
+
+  await submitPrompt($, '가'.repeat(80))
+  await clock.settle()
+
+  expect(calls).toBe(1)
 })
 
 test('짧은 글은 모델을 부르지 않는다', async ($, on) => {

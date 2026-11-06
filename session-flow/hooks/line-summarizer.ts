@@ -13,8 +13,13 @@ const SUMMARY_TIMEOUT_MS = 15_000
 /** 긴 글의 앞부분만 보내 호출 비용을 묶는다. 다만 질문은 글 끝에 있으니 끝도 함께 보낸다. */
 const MAX_SOURCE_HEAD_CHARS = 3_000
 const MAX_SOURCE_TAIL_CHARS = 1_000
-/** 이보다 짧은 글은 이미 한 줄로 읽히니 호출하지 않는다. */
-export const MIN_CHARS_WORTH_SUMMARIZING = 40
+/**
+ * 사람이 친 글은 이 길이까지 원문으로 둔다. 옆 창에서 서너 줄이면 읽을 만하고, 그보다 긴 글은
+ * 대부분 160자를 넘는 긴 지시라서 요약이 더 낫다(실제 프롬프트 987개로 쟀다).
+ */
+export const MIN_REQUEST_CHARS_WORTH_SUMMARIZING = 80
+/** 답은 이보다 짧으면 한 줄로 읽혀서 호출하지 않는다. 질문 찾기도 이 호출에 함께 있다. */
+export const MIN_ANSWER_CHARS_WORTH_SUMMARIZING = 40
 const NO_QUESTION = '없음'
 const SUMMARY_LINE = /^요약:\s*(.+)$/m
 const QUESTION_LINE = /^질문:\s*(.+)$/m

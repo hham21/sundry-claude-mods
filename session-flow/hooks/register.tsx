@@ -26,7 +26,8 @@ import { paletteNamed } from './flow-palette'
 import type { FlowPalette } from './flow-palette'
 import { drawFlowPane } from './flow-pane'
 import {
-  MIN_CHARS_WORTH_SUMMARIZING,
+  MIN_ANSWER_CHARS_WORTH_SUMMARIZING,
+  MIN_REQUEST_CHARS_WORTH_SUMMARIZING,
   digestAnswerLater,
   summarizeRequestLater,
 } from './line-summarizer'
@@ -183,7 +184,7 @@ async function recordRequest(
   await closeQuestions($)
   const rowId = await addRequest($, flattenToOneLine(text), isInterjection)
 
-  if (isSummarizing && text.length >= MIN_CHARS_WORTH_SUMMARIZING) {
+  if (isSummarizing && text.length >= MIN_REQUEST_CHARS_WORTH_SUMMARIZING) {
     summarizeRequestLater($, rowId, text)
   }
 }
@@ -378,7 +379,7 @@ export const register: Register = (on, options) => {
     const isDigestWorthwhile =
       isSummarizing() &&
       e.reason === 'answer' &&
-      e.answer.length >= MIN_CHARS_WORTH_SUMMARIZING
+      e.answer.length >= MIN_ANSWER_CHARS_WORTH_SUMMARIZING
     const question =
       e.reason === 'answer' && !isDigestWorthwhile
         ? lastQuestion(e.answer)
