@@ -10,12 +10,7 @@ import type {
 } from 'claude-code'
 
 import { formatDuration } from '../hooks/flow-pane'
-import {
-  cellWidth,
-  clipToCells,
-  firstSentence,
-  flattenToOneLine,
-} from '../hooks/one-line'
+import { firstSentence, flattenToOneLine } from '../hooks/one-line'
 
 const PANE_ID = 'session-flow'
 const WIDE_COLUMNS = 60
@@ -1635,23 +1630,16 @@ test('긴 글은 글자가 깨지지 않게 자른다', () => {
   expect(flattenToOneLine('여러\n\n  줄을   합친다')).toBe('여러 줄을 합친다')
 })
 
-test('글자 수가 아니라 칸 수로 자른다', () => {
-  expect(cellWidth('가a')).toBe(3)
-  expect(clipToCells('가나다라', 8)).toBe('가나다라')
-  expect(clipToCells('가나다라', 7)).toBe('가나다…')
-  expect(clipToCells('abcdef', 4)).toBe('abc…')
-})
+test('좁은 창에서도 문장을 자르지 않는다', async ($, on) => {
+  standInForEngine(on)
+  const sentence = '장바구니 예제가 어떤 구조로 되어 있는지 알아보려고 안내문부터 차례로 읽어 보겠습니다.'
 
-test('긴 글은 두 줄 분량까지 보이고 그 뒤는 잘린다', async ($, on) => {
-  standInForEngine(on, {})
+  await submitPrompt($, sentence)
+  await completeTurn($, sentence, 2_000)
 
-  const longRequest = '가나다라마바사아자차카타파하'.repeat(10)
-  await submitPrompt($, longRequest)
-
-  const [line = ''] = await linesOnPane($, 'terminal', 30)
-  expect(line.endsWith('…')).toBe(true)
-  expect(cellWidth(line)).toBeLessThanOrEqual(2 + 28 * 2)
-  expect(cellWidth(line)).toBeGreaterThan(28)
+  const lines = await linesOnPane($, 'terminal', 30)
+  expect(lines).toContain(`❯ ${sentence}`)
+  expect(lines).toContain(`✓ 2초 · ${sentence}`)
 })
 
 test('걸린 시간을 읽기 쉽게 쓴다', () => {

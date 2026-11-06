@@ -12,40 +12,6 @@ const SENTENCE_BREAK = /(?<=[.!?。])\s+|\n+/
 const LINE_MARKER = /^\s*(?:#{1,6}|[-*+>]|\d+[.)])\s+/
 const INLINE_MARKUP = /\*\*|`/g
 
-/** 터미널에서 두 칸을 차지하는 글자. 한글, 한자, 전각 문자, 이모지가 여기 든다. */
-const WIDE_CHARACTER =
-  /[\u1100-\u115F\u2E80-\uA4CF\uAC00-\uD7A3\uF900-\uFAFF\uFE30-\uFE6F\uFF00-\uFF60\uFFE0-\uFFE6\u{1F300}-\u{1FAFF}]/u
-const ELLIPSIS = '…'
-
-export function cellWidth(text: string): number {
-  return Array.from(text).reduce(
-    (width, character) => width + (WIDE_CHARACTER.test(character) ? 2 : 1),
-    0,
-  )
-}
-
-/** 주어진 칸 수에 들어가게 자른다. 글자 수가 아니라 칸 수로 재야 한글이 맞는다. */
-export function clipToCells(text: string, maxCells: number): string {
-  if (cellWidth(text) <= maxCells) {
-    return text
-  }
-
-  let usedCells = cellWidth(ELLIPSIS)
-  let clipped = ''
-
-  for (const character of text) {
-    usedCells += cellWidth(character)
-
-    if (usedCells > maxCells) {
-      break
-    }
-
-    clipped += character
-  }
-
-  return `${clipped}${ELLIPSIS}`
-}
-
 function cutToRowLength(text: string): string {
   // 문자 단위로 잘라야 이모지 같은 서로게이트 쌍이 반으로 갈라지지 않는다.
   const characters = Array.from(text)

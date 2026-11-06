@@ -468,12 +468,7 @@ export const register: Register = (on, options) => {
       return next(e)
     }
 
-    return drawQuestionBand(
-      $.ui.resolve(e),
-      questions,
-      e.props.bodyColumns,
-      () => closeQuestions($),
-    )
+    return drawQuestionBand($.ui.resolve(e), questions, () => closeQuestions($))
   })
 
   on('ui.render', { component: 'Pane', requestId: PANE_ID }, async ($, e) => {
